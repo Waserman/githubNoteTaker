@@ -1,0 +1,3 @@
+rootProject.name = 'gitubNoteTaker'
+
+include ':app'
