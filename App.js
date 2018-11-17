@@ -8,7 +8,7 @@
 
 import React, { Component } from "react";
 import { Platform, StyleSheet, Text, View, NavigatorIOS } from "react-native";
-import Main from "./App/components/main";
+import Search from "./App/components/search";
 
 const instructions = Platform.select({
   ios: "Press Cmd+R to reload,\n" + "Cmd+D or shake for dev menu",
@@ -31,7 +31,7 @@ export default class App extends Component<Props> {
       <NavigatorIOS
         style={styles.container}
         initialRoute={{
-          component: Main,
+          component: Search,
           title: "github notetaker"
         }}
         style={{ flex: 1 }}

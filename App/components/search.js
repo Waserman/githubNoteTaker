@@ -4,7 +4,8 @@ import {
   View,
   StyleSheet,
   TouchableHighlight,
-  TextInput
+  TextInput,
+  ActivityIndicator
 } from "react-native";
 import { getBio } from "../utils/api";
 
@@ -40,6 +41,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     width: 200,
     color: "#ececec"
+  },
+  inputError: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "red"
   }
 });
 export default class Main extends Component {
@@ -47,8 +53,9 @@ export default class Main extends Component {
     super(props);
     this.state = {
       username: "",
-      loading: false,
-      error: undefined
+      isLoading: false,
+      error: undefined,
+      bio: null
     };
   }
   onUsernameChanged(event) {
@@ -57,19 +64,28 @@ export default class Main extends Component {
     });
   }
 
+  searchInputFocus() {
+    this.setState({ username: "" });
+  }
   async onSubmit() {
     this.setState({
-      loading: true
+      isLoading: true
     });
     try {
-      const data = await getBio(this.state.username);
-      console.log(data);
+      const res = await getBio(this.state.username);
+      if (!res.message) {
+        this.setState({ bio: res, isLoading: false, error: undefined });
+      } else {
+        this.setState({ error: res.message, isLoading: false });
+      }
     } catch (ex) {
-      console.log(ex);
+      this.setState({ error: ex.message, isLoading: false });
+      console.error(ex);
     }
   }
 
   render() {
+    const { isLoading, error } = this.state;
     return (
       <View style={styles.mainContainer}>
         <Text style={styles.captionText}>
@@ -79,15 +95,21 @@ export default class Main extends Component {
           placeholder="username..."
           style={styles.input}
           value={this.state.username}
+          onFocus={this.searchInputFocus.bind(this)}
           onChange={this.onUsernameChanged.bind(this)}
         />
-        <TouchableHighlight
-          style={styles.button}
-          onPress={this.onSubmit.bind(this)}
-          underlayColor="#B6C2D9"
-        >
-          <Text style={styles.buttonText}>SUBMIT</Text>
-        </TouchableHighlight>
+        {error && <Text style={styles.inputError}>{error}</Text>}
+        {!isLoading ? (
+          <TouchableHighlight
+            style={styles.button}
+            onPress={this.onSubmit.bind(this)}
+            underlayColor="#B6C2D9"
+          >
+            <Text style={styles.buttonText}>SUBMIT</Text>
+          </TouchableHighlight>
+        ) : (
+          <ActivityIndicator color="#fff" size="large" />
+        )}
       </View>
     );
   }
